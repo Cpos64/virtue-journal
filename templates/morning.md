@@ -27,6 +27,7 @@ Reflect briefly. Be honest. Mark **Y** or **N**.
 | Mindfulness   |           |
 | Contentment   |           |
 | Abstinence    |           |
+| Purity        |           |
 | Wisdom        |           |
 | Moderation    |           |
 

@@ -47,6 +47,12 @@ Say no to excess. Choose restraint that leads to freedom.
 
 ---
 
+## Purity
+**Guard your heart, mind, and body.**  
+Choose what is clean and life-giving. Reject what contaminates thoughts, desires, or actions.
+
+---
+
 ## Wisdom
 **Seek understanding and choose rightly.**  
 Apply knowledge with discernment. Favor long-term good over short-term ease.
