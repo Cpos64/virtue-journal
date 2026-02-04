@@ -71,17 +71,16 @@ def ask_text(prompt: str) -> str:
 
 def replace_yn_for_label(text: str, label_phrase: str, value: str) -> str:
     """
-    Replace the first '(Y/N)' that appears on a line containing label_phrase
-    with '(Y)' or '(N)'.
+    Replace the first '(...)' Y/N marker on a line containing label_phrase with '(Y)' or '(N)'.
 
-    Example line in markdown:
-      - **Did you get to bed on time?** (Y/N)
+    Works whether the line currently contains:
+      (Y/N)  OR  (Y)  OR  (N)
 
-    We match by phrase, not exact punctuation/formatting.
+    This makes the CLI safe to run multiple times.
     """
-    # Find a line that contains the phrase and includes (Y/N)
+    # Match a line containing the phrase and a parenthesized marker (Y/N, Y, or N)
     pattern = re.compile(
-        rf"^(?P<line>.*{re.escape(label_phrase)}.*)\(Y/N\)(?P<rest>.*)$",
+        rf"^(?P<line>.*{re.escape(label_phrase)}.*)\((Y/N|Y|N)\)(?P<rest>.*)$",
         re.MULTILINE,
     )
     m = pattern.search(text)
@@ -89,8 +88,10 @@ def replace_yn_for_label(text: str, label_phrase: str, value: str) -> str:
         raise ValueError(f"Could not find Y/N field for label containing: {label_phrase}")
 
     full_line = m.group(0)
-    new_line = full_line.replace("(Y/N)", f"({value})", 1)
+    # Replace only the first occurrence of the marker on that line
+    new_line = re.sub(r"\((Y/N|Y|N)\)", f"({value})", full_line, count=1)
     return text[: m.start()] + new_line + text[m.end() :]
+
 
 
 def fill_table_practiced(text: str, table_heading: str, answers: dict[str, str]) -> str:
@@ -138,6 +139,18 @@ def fill_table_practiced(text: str, table_heading: str, answers: dict[str, str])
     new_after = "".join(lines[:table_start] + table_lines_filled + lines[table_end:])
     return text[:idx] + new_after
 
+def remove_empty_bullets(text: str) -> str:
+    """
+    Remove markdown list items that are just '- ' or '-'.
+    """
+    lines = text.splitlines()
+    cleaned = []
+    for line in lines:
+        if line.strip() in {"-", "- "}:
+            continue
+        cleaned.append(line)
+    return "\n".join(cleaned) + "\n"
+
 
 def morning() -> Path:
     path = init_today(force_if_empty=True)
@@ -160,7 +173,7 @@ def morning() -> Path:
         virtue_answers[v] = ask_yn(v)
 
     text = fill_table_practiced(text, "## Virtues (Yesterday) — Y/N", virtue_answers)
-
+    text = remove_empty_bullets(text)
     path.write_text(text, encoding="utf-8")
     print(f"\n✅ Updated: {path}")
     return path
@@ -168,20 +181,26 @@ def morning() -> Path:
 
 def replace_line_value(text: str, line_prefix: str, value: str) -> str:
     """
-    Replace the content after a markdown label line like:
-      - **What time will you get into bed?**
-    where the line currently is:
-      - **What time will you get into bed?**
-    (blank after). We keep it simple by converting to:
-      - **What time will you get into bed?** 10:30 PM
+    Replace the value on a markdown bullet line that starts with line_prefix.
+
+    Example:
+      - **What time will you get into bed?** 9:15 PM
+
+    Re-running will replace the existing value (9:15 PM) with the new one.
     """
-    pattern = re.compile(rf"^(?P<prefix>.*{re.escape(line_prefix)}.*)$", re.MULTILINE)
+    # Match the full line that contains the label (the bold text), and capture it up to the closing **
+    pattern = re.compile(
+        rf"^(?P<label>\s*-\s*\*\*{re.escape(line_prefix)}\*\*)(?P<after>.*)$",
+        re.MULTILINE,
+    )
     m = pattern.search(text)
     if not m:
         raise ValueError(f"Could not find line for: {line_prefix}")
-    full_line = m.group(0).rstrip()
-    new_line = f"{full_line} {value}".rstrip()
+
+    # Replace entire trailing part with exactly one space + value (or nothing if value blank)
+    new_line = f"{m.group('label')} {value}".rstrip()
     return text[: m.start()] + new_line + text[m.end() :]
+
 
 
 def evening() -> Path:
@@ -202,9 +221,9 @@ def evening() -> Path:
 
     # Fill bedtime + one-thing lines
     if bedtime.strip():
-        text = replace_line_value(text, "- **What time will you get into bed?**", bedtime.strip())
+        text = replace_line_value(text, "What time will you get into bed?", bedtime.strip())
     if one_thing.strip():
-        text = replace_line_value(text, "- **What is one thing you’ll do to set tomorrow up well?**", one_thing.strip())
+        text = replace_line_value(text, "What is one thing you’ll do to set tomorrow up well?", one_thing.strip())
 
     print("\nVirtues (Today) — y/n\n")
     virtue_answers: dict[str, str] = {}
@@ -212,7 +231,7 @@ def evening() -> Path:
         virtue_answers[v] = ask_yn(v)
 
     text = fill_table_practiced(text, "## Virtues (Today) — Y/N", virtue_answers)
-
+    text = remove_empty_bullets(text)
     path.write_text(text, encoding="utf-8")
     print(f"\n✅ Updated: {path}")
     return path
