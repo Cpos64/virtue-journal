@@ -64,6 +64,11 @@ def ask_yn(prompt: str) -> str:
         print("Please type y or n.")
 
 
+def ask_text(prompt: str) -> str:
+    """Return a single-line text answer (can be blank)."""
+    return input(f"{prompt}: ").rstrip()
+
+
 def replace_yn_for_label(text: str, label_phrase: str, value: str) -> str:
     """
     Replace the first '(Y/N)' that appears on a line containing label_phrase
@@ -161,16 +166,71 @@ def morning() -> Path:
     return path
 
 
+def replace_line_value(text: str, line_prefix: str, value: str) -> str:
+    """
+    Replace the content after a markdown label line like:
+      - **What time will you get into bed?**
+    where the line currently is:
+      - **What time will you get into bed?**
+    (blank after). We keep it simple by converting to:
+      - **What time will you get into bed?** 10:30 PM
+    """
+    pattern = re.compile(rf"^(?P<prefix>.*{re.escape(line_prefix)}.*)$", re.MULTILINE)
+    m = pattern.search(text)
+    if not m:
+        raise ValueError(f"Could not find line for: {line_prefix}")
+    full_line = m.group(0).rstrip()
+    new_line = f"{full_line} {value}".rstrip()
+    return text[: m.start()] + new_line + text[m.end() :]
+
+
+def evening() -> Path:
+    path = init_today(force_if_empty=True)
+    text = path.read_text(encoding="utf-8")
+
+    print("\nEvening — quick review & pre-decision\n")
+
+    did_accomplish = ask_yn("Did you do what you wanted to accomplish today?")
+    will_pray = ask_yn("Will you pray before sleep?")
+
+    bedtime = ask_text("What time will you get into bed (e.g., 10:30 PM)")
+    one_thing = ask_text("One thing you'll do to set tomorrow up well (short)")
+
+    # Fill evening Y/N fields (by label phrase)
+    text = replace_yn_for_label(text, "Did you do what you wanted to accomplish today", did_accomplish)
+    text = replace_yn_for_label(text, "Will you pray before sleep", will_pray)
+
+    # Fill bedtime + one-thing lines
+    if bedtime.strip():
+        text = replace_line_value(text, "- **What time will you get into bed?**", bedtime.strip())
+    if one_thing.strip():
+        text = replace_line_value(text, "- **What is one thing you’ll do to set tomorrow up well?**", one_thing.strip())
+
+    print("\nVirtues (Today) — y/n\n")
+    virtue_answers: dict[str, str] = {}
+    for v in VIRTUES:
+        virtue_answers[v] = ask_yn(v)
+
+    text = fill_table_practiced(text, "## Virtues (Today) — Y/N", virtue_answers)
+
+    path.write_text(text, encoding="utf-8")
+    print(f"\n✅ Updated: {path}")
+    return path
+
+
 def usage() -> str:
     return (
         "Usage:\n"
         "  python tools/journal.py init\n"
         "  python tools/journal.py morning\n"
+        "  python tools/journal.py evening\n"
         "\n"
         "Commands:\n"
         "  init     Create today's daily entry from templates/daily.md (fills if empty)\n"
         "  morning  Ask quick Y/N prompts and fill Morning section\n"
+        "  evening  Ask quick prompts and fill Evening section\n"
     )
+
 
 
 def main(argv: list[str]) -> int:
@@ -188,6 +248,11 @@ def main(argv: list[str]) -> int:
     if cmd == "morning":
         morning()
         return 0
+    
+    if cmd == "evening":
+        evening()
+        return 0
+
 
     print(f"Unknown command: {cmd}\n")
     print(usage())
