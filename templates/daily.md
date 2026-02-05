@@ -24,15 +24,16 @@
 | Purity        |           |
 | Wisdom        |           |
 | Moderation    |           |
+| Generosity    |           |
 
 ## Intentions for Today
-**What do you want to accomplish today?**
+**What do you want to accomplish?**
 - 
 
-**How will you learn and grow today?**
+**How will you learn and grow?**
 - 
 
-**How will you give today?**
+**How will you give?**
 - 
 
 ## Prayer / Word
@@ -44,28 +45,14 @@
 # Evening
 
 ## Review (Today)
-**Did you do what you wanted to accomplish today?** (Y/N)  
-- If not, why? (1 sentence)
-
-**What did you learn today?**
+**Accomplishments (from this morning):** 
 - 
 
-**How did you see the Father’s goodness today?**
+**What did you learn?**
 - 
 
-## Virtues (Today) — Y/N
-| Virtue        | Practiced |
-|---------------|-----------|
-| Silence       |           |
-| Frugality     |           |
-| Industry      |           |
-| Humility      |           |
-| Mindfulness   |           |
-| Contentment   |           |
-| Abstinence    |           |
-| Purity        |           |
-| Wisdom        |           |
-| Moderation    |           |
+**How did you see the Father’s goodness?**
+- 
 
 ## Pre-Decision (Tonight)
 - **What time will you get into bed?**  

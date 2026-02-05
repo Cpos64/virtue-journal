@@ -7,7 +7,7 @@ The goal is awareness, honesty, and steady formation — not perfection.
 
 ## Silence
 **Speak only when it benefits; avoid trifling conversation.**  
-Guard your words. Let speech be intentional, truthful, and necessary.
+Guard your tongue. Let speech be intentional, truthful, and necessary. Avoid fillers and flattery; speak slow and pause before response. Even the fool seems perceptive when he remains quiet. 
 
 ---
 
@@ -62,3 +62,9 @@ Apply knowledge with discernment. Favor long-term good over short-term ease.
 ## Moderation
 **Avoid extremes; maintain balance in all things.**  
 Neither indulgence nor deprivation, but steady restraint.
+
+---
+
+## Generosity
+**Give liberally as you've been given.**
+Freely giving time, attention, resources, and grace without resentment or expectation of return.

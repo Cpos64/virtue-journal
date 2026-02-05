@@ -20,6 +20,7 @@ VIRTUES = [
     "Purity",
     "Wisdom",
     "Moderation",
+    "Generosity",
 ]
 
 
@@ -67,6 +68,17 @@ def ask_yn(prompt: str) -> str:
 def ask_text(prompt: str) -> str:
     """Return a single-line text answer (can be blank)."""
     return input(f"{prompt}: ").rstrip()
+
+
+def ask_multi_items(prompt: str) -> list[str]:
+    items: list[str] = []
+    while True:
+        ans = ask_text(f"{prompt} (d if done)").strip()
+        if ans.lower() in {"d", "done"}:
+            break
+        if ans:
+            items.append(ans)
+    return items
 
 
 def replace_yn_for_label(text: str, label_phrase: str, value: str) -> str:
@@ -126,6 +138,7 @@ def fill_table_practiced(text: str, table_heading: str, answers: dict[str, str])
 
     table_lines = lines[table_start:table_end]
 
+
     def fill_row(row: str) -> str:
         m = re.match(r"^\|\s*(?P<virtue>[^|]+?)\s*\|\s*(?P<val>[^|]*)\|\s*$", row.strip())
         if not m:
@@ -139,6 +152,7 @@ def fill_table_practiced(text: str, table_heading: str, answers: dict[str, str])
     new_after = "".join(lines[:table_start] + table_lines_filled + lines[table_end:])
     return text[:idx] + new_after
 
+
 def remove_empty_bullets(text: str) -> str:
     """
     Remove markdown list items that are just '- ' or '-'.
@@ -151,6 +165,36 @@ def remove_empty_bullets(text: str) -> str:
         cleaned.append(line)
     return "\n".join(cleaned) + "\n"
 
+def replace_bullets_under_question(text: str, question_phrase: str, items: list[str]) -> str:
+    """
+    Find the line containing `question_phrase`, then replace the markdown bullet list
+    immediately below it with `items` formatted as "- ...".
+
+    Stops replacing when it hits a non-bullet line.
+    """
+    lines = text.splitlines(True)
+
+    for i, line in enumerate(lines):
+        if question_phrase in line:
+            j = i + 1
+
+            # Skip and remove existing bullet lines under the question
+            while j < len(lines) and lines[j].lstrip().startswith("-"):
+                j += 1
+
+            bullet_lines = [f"- {it}\n" for it in items]
+            new_lines = lines[: i + 1] + bullet_lines + lines[j:]
+            return "".join(new_lines)
+
+    raise ValueError(f"Could not find question line containing: {question_phrase}")
+
+
+def replace_single_bullet_under_question(text: str, question_phrase: str, value: str) -> str:
+    value = value.strip()
+    if not value:
+        return text
+    return replace_bullets_under_question(text, question_phrase, [value])
+
 
 def morning() -> Path:
     path = init_today(force_if_empty=True)
@@ -158,14 +202,24 @@ def morning() -> Path:
 
     print("\nMorning — quick check-in\n")
 
+    time_in_bed = ask_text("Time in bed (e.g., 10:30 PM - 6:15 AM)")
+    hours_slept = ask_text("Hours slept (e.g., 7h45m)")
+
     bed_on_time = ask_yn("Did you get to bed on time?")
     ended_prayer = ask_yn("Did you end the day with prayer?")
     first_alarm = ask_yn("Did you wake at the first alarm?")
 
-    # Robust fill by label phrase (matches the template line regardless of bold/punctuation)
+    # Fill Sleep & Discipline fields
+    if time_in_bed.strip():
+        text = replace_line_value(text, "Time in bed:", time_in_bed.strip())
+    if hours_slept.strip():
+        text = replace_line_value(text, "Hours slept:", hours_slept.strip())
+
+    # Fill Y/N fields (robust by label phrase)
     text = replace_yn_for_label(text, "Did you get to bed on time", bed_on_time)
     text = replace_yn_for_label(text, "Did you end the day with prayer", ended_prayer)
     text = replace_yn_for_label(text, "Did you wake at the first alarm", first_alarm)
+
 
     print("\nVirtues (Yesterday) — y/n\n")
     virtue_answers: dict[str, str] = {}
@@ -173,6 +227,32 @@ def morning() -> Path:
         virtue_answers[v] = ask_yn(v)
 
     text = fill_table_practiced(text, "## Virtues (Yesterday) — Y/N", virtue_answers)
+
+    # Accomplishments (multi-item loop)
+    accomplishments = ask_multi_items("What do you want to accomplish?")
+    if accomplishments:
+        text = replace_bullets_under_question(
+            text,
+            "What do you want to accomplish?",
+            accomplishments,
+        )
+
+    # Learning & Giving (single-item)
+    learn_grow = ask_text("How will you learn and grow?")
+    give_today = ask_text("How will you give?")
+
+    scripture_read = ask_text("Scripture read (e.g., Matthew 5)")
+    prayer_focus = ask_text("Prayer focus")
+
+    text = replace_single_bullet_under_question(text, "How will you learn and grow?", learn_grow)
+    text = replace_single_bullet_under_question(text, "How will you give?", give_today)
+
+    if scripture_read.strip():
+        text = replace_line_value(text, "Scripture read:", scripture_read.strip())
+    if prayer_focus.strip():
+        text = replace_line_value(text, "Prayer focus:", prayer_focus.strip())
+
+
     text = remove_empty_bullets(text)
     path.write_text(text, encoding="utf-8")
     print(f"\n✅ Updated: {path}")
@@ -201,6 +281,27 @@ def replace_line_value(text: str, line_prefix: str, value: str) -> str:
     new_line = f"{m.group('label')} {value}".rstrip()
     return text[: m.start()] + new_line + text[m.end() :]
 
+def read_bullets_under_question(text: str, question_phrase: str) -> list[str]:
+    """
+    Read markdown bullet items (lines starting with '-') immediately under the line
+    containing `question_phrase`. Stops when a non-bullet line is reached.
+    Returns the bullet text without the leading '- '.
+    """
+    lines = text.splitlines()
+    for i, line in enumerate(lines):
+        if question_phrase in line:
+            items: list[str] = []
+            j = i + 1
+            while j < len(lines):
+                ln = lines[j].strip()
+                if not ln.startswith("-"):
+                    break
+                item = ln.lstrip("-").strip()
+                if item:
+                    items.append(item)
+                j += 1
+            return items
+    return []
 
 
 def evening() -> Path:
@@ -209,32 +310,57 @@ def evening() -> Path:
 
     print("\nEvening — quick review & pre-decision\n")
 
-    did_accomplish = ask_yn("Did you do what you wanted to accomplish today?")
+    # 1) Per-accomplishment accountability (from morning bullets)
+    accomplishments = read_bullets_under_question(text, "What do you want to accomplish?")
+    accomplished_results: list[str] = []
+
+    if accomplishments:
+        print("\nAccomplishments — y/n\n")
+        for item in accomplishments:
+            yn = ask_yn(f"Did you: {item}")
+            accomplished_results.append(f"- [{yn}] {item}")
+    else:
+        print("\n(No accomplishments listed this morning.)\n")
+
+    # 2) Other evening prompts
+    learned = ask_text("What did you learn?")
+    goodness = ask_text("How did you see the Father’s goodness?")
+
     will_pray = ask_yn("Will you pray before sleep?")
-
     bedtime = ask_text("What time will you get into bed (e.g., 10:30 PM)")
-    one_thing = ask_text("One thing you'll do to set tomorrow up well (short)")
+    one_thing = ask_text("One thing you'll do to set tomorrow up well")
 
-    # Fill evening Y/N fields (by label phrase)
-    text = replace_yn_for_label(text, "Did you do what you wanted to accomplish today", did_accomplish)
+    # 3) Write accomplishments into the Evening Review section
+    # Replace the bullet under: "**Did you do what you wanted to accomplish today?** (Y/N)"
+    # with the checklist we just built.
+    if accomplished_results:
+        text = replace_bullets_under_question(
+            text,
+            "Did you do what you wanted to accomplish?",
+            accomplished_results,
+        )
+
+    # 4) Fill the other evening bullets
+    text = replace_single_bullet_under_question(text, "What did you learn?", learned)
+    text = replace_single_bullet_under_question(text, "How did you see the Father’s goodness?", goodness)
+
+    # 5) Fill Pre-Decision (Tonight) fields
     text = replace_yn_for_label(text, "Will you pray before sleep", will_pray)
 
-    # Fill bedtime + one-thing lines
     if bedtime.strip():
         text = replace_line_value(text, "What time will you get into bed?", bedtime.strip())
     if one_thing.strip():
-        text = replace_line_value(text, "What is one thing you’ll do to set tomorrow up well?", one_thing.strip())
+        text = replace_bullets_under_question(
+            text,
+            "What is one thing you’ll do to set tomorrow up well?",
+            [one_thing.strip()],
+        )
 
-    print("\nVirtues (Today) — y/n\n")
-    virtue_answers: dict[str, str] = {}
-    for v in VIRTUES:
-        virtue_answers[v] = ask_yn(v)
-
-    text = fill_table_practiced(text, "## Virtues (Today) — Y/N", virtue_answers)
     text = remove_empty_bullets(text)
     path.write_text(text, encoding="utf-8")
     print(f"\n✅ Updated: {path}")
     return path
+
 
 
 def usage() -> str:

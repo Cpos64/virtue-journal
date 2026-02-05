@@ -30,18 +30,19 @@ Reflect briefly. Be honest. Mark **Y** or **N**.
 | Purity        |           |
 | Wisdom        |           |
 | Moderation    |           |
+| Generosity    |           |
 
 ---
 
 ## Intentions for Today
 
-**What do you want to accomplish today?**
+**What do you want to accomplish?**
 - 
 
-**How will you learn and grow today?**
+**How will you learn and grow?**
 - 
 
-**How will you give today?**
+**How will you give?**
 - 
 
 ---
