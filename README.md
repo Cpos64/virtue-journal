@@ -3,7 +3,7 @@
 A daily **Morning Check-In** and **Evening Review** journal designed to cultivate virtue,
 intentional living, and faithful discipline — without friction.
 
-**How you start and end your days plays a big role in how your days go**.
+**"How you begin and conclude each day shapes the day itself."**
 
 ---
 
@@ -53,11 +53,6 @@ The morning entry sets the direction for the day.
 
 This is designed to be **quick, honest, and grounding**.
 
-Run with:
-```bash
-python tools/journal.py morning
-```
-
 ---
 
 ### Evening Review (Reflection + Pre-Decision)
@@ -73,20 +68,30 @@ The evening entry closes the day intentionally and prepares for tomorrow.
 
 Tomorrow begins with how today ends.
 
-Run with:
-```bash
-python tools/journal.py evening
-```
-
 ---
 
 ## How to Use
 
 ### Create today’s entry
-Creates the daily markdown file if it doesn’t exist.
+1) Create the daily markdown file if it doesn’t exist. 
 
+Run with:
 ```bash
 python tools/journal.py init
+```
+
+2) Launch Morning Check-In (CLI)
+
+Run with:
+```bash
+python tools/journal.py morning
+```
+
+3) Launch Evening Review (CLI)
+
+Run with:
+```bash
+python tools/journal.py evening
 ```
 
 > Note: journal entries live locally in `entries/` and are ignored by Git (via `.gitignore`).
