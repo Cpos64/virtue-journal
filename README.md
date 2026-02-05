@@ -31,6 +31,7 @@ The following virtues are evaluated daily using a simple **Y / N** reflection:
 - Purity
 - Wisdom
 - Moderation
+- Generosity
 
 Definitions and intent for each virtue live in [`virtues.md`](./virtues.md).
 
@@ -63,9 +64,8 @@ python tools/journal.py morning
 
 The evening entry closes the day intentionally and prepares for tomorrow.
 
-- Review the day honestly
+- Review accomplishments from this morning (each item is checked **Y/N**)
 - Reflect on learning and gratitude
-- Evaluate **today’s virtues** (Y / N)
 - Pre-decide:
   - bedtime
   - prayer before sleep
@@ -87,4 +87,6 @@ Creates the daily markdown file if it doesn’t exist.
 
 ```bash
 python tools/journal.py init
+```
 
+> Note: journal entries live locally in `entries/` and are ignored by Git (via `.gitignore`).
