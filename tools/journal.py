@@ -318,7 +318,7 @@ def evening() -> Path:
         print("\nAccomplishments — y/n\n")
         for item in accomplishments:
             yn = ask_yn(f"Did you: {item}")
-            accomplished_results.append(f"- [{yn}] {item}")
+            accomplished_results.append(f"[{yn}] {item}")
     else:
         print("\n(No accomplishments listed this morning.)\n")
 
@@ -331,14 +331,13 @@ def evening() -> Path:
     one_thing = ask_text("One thing you'll do to set tomorrow up well")
 
     # 3) Write accomplishments into the Evening Review section
-    # Replace the bullet under: "**Did you do what you wanted to accomplish today?** (Y/N)"
-    # with the checklist we just built.
     if accomplished_results:
         text = replace_bullets_under_question(
             text,
-            "Did you do what you wanted to accomplish?",
+            "Accomplishments (from this morning):",
             accomplished_results,
         )
+
 
     # 4) Fill the other evening bullets
     text = replace_single_bullet_under_question(text, "What did you learn?", learned)
