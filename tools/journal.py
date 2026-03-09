@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 import re
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_PATH = REPO_ROOT / "templates" / "daily.md"
@@ -43,14 +43,25 @@ def init_today(force_if_empty: bool = True) -> Path:
     out_path = entry_path_for(d)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    def build_today_text() -> str:
+        text = render_daily_template(d)
+        unfinished = get_unfinished_tasks()
+        if unfinished:
+            text = replace_bullets_under_question(
+                text,
+                "What do you want to accomplish?",
+                unfinished,
+            )
+        return text
+
     if out_path.exists():
         if force_if_empty:
             existing = out_path.read_text(encoding="utf-8", errors="ignore")
             if existing.strip() == "":
-                out_path.write_text(render_daily_template(d), encoding="utf-8")
+                out_path.write_text(build_today_text(), encoding="utf-8")
         return out_path
 
-    out_path.write_text(render_daily_template(d), encoding="utf-8")
+    out_path.write_text(build_today_text(), encoding="utf-8")
     return out_path
 
 
@@ -195,6 +206,31 @@ def replace_single_bullet_under_question(text: str, question_phrase: str, value:
         return text
     return replace_bullets_under_question(text, question_phrase, [value])
 
+def get_unfinished_tasks() -> list[str]:
+    yesterday = date.today() - timedelta(days=1)
+    yesterday_file = entry_path_for(yesterday)
+
+    unfinished: list[str] = []
+
+    if not yesterday_file.exists():
+        return unfinished
+
+    text = yesterday_file.read_text(encoding="utf-8")
+
+    pattern = r"\*\*Accomplishments \(from this morning\):\*\*([\s\S]*?)(?:\n##|\Z)"
+    match = re.search(pattern, text)
+
+    if not match:
+        return unfinished
+
+    for line in match.group(1).splitlines():
+        line = line.strip()
+        if line.startswith("- [N]"):
+            task = line.replace("- [N]", "", 1).strip()
+            if task:
+                unfinished.append(task)
+
+    return unfinished
 
 def morning() -> Path:
     path = init_today(force_if_empty=True)
