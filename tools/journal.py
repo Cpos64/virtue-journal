@@ -265,12 +265,19 @@ def morning() -> Path:
     text = fill_table_practiced(text, "## Virtues (Yesterday) — Y/N", virtue_answers)
 
     # Accomplishments (multi-item loop)
-    accomplishments = ask_multi_items("What do you want to accomplish?")
-    if accomplishments:
+    existing_accomplishments = read_bullets_under_question(text, "What do you want to accomplish?")
+    new_accomplishments = ask_multi_items("What do you want to accomplish?")
+
+    combined_accomplishments = existing_accomplishments.copy()
+    for item in new_accomplishments:
+        if item not in combined_accomplishments:
+            combined_accomplishments.append(item)
+
+    if combined_accomplishments:
         text = replace_bullets_under_question(
             text,
             "What do you want to accomplish?",
-            accomplishments,
+            combined_accomplishments,
         )
 
     # Learning & Giving (single-item)
