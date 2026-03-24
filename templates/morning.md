@@ -6,8 +6,6 @@
 
 ## Sleep & Discipline (Last Night)
 
-- **Time in bed:**  
-- **Hours slept:**  
 - **Did you get to bed on time?** (Y/N)  
 - **Did you end the day with prayer?** (Y/N)  
 - **Did you wake at the first alarm?** (Y/N)  
@@ -43,6 +41,9 @@ Reflect briefly. Be honest. Mark **Y** or **N**.
 - 
 
 **How will you give?**
+- 
+
+**What are your plans after work?**
 - 
 
 ---

@@ -238,18 +238,9 @@ def morning() -> Path:
 
     print("\nMorning — quick check-in\n")
 
-    time_in_bed = ask_text("Time in bed (e.g., 10:30 PM - 6:15 AM)")
-    hours_slept = ask_text("Hours slept (e.g., 7h45m)")
-
     bed_on_time = ask_yn("Did you get to bed on time?")
     ended_prayer = ask_yn("Did you end the day with prayer?")
     first_alarm = ask_yn("Did you wake at the first alarm?")
-
-    # Fill Sleep & Discipline fields
-    if time_in_bed.strip():
-        text = replace_line_value(text, "Time in bed:", time_in_bed.strip())
-    if hours_slept.strip():
-        text = replace_line_value(text, "Hours slept:", hours_slept.strip())
 
     # Fill Y/N fields (robust by label phrase)
     text = replace_yn_for_label(text, "Did you get to bed on time", bed_on_time)
@@ -283,12 +274,15 @@ def morning() -> Path:
     # Learning & Giving (single-item)
     learn_grow = ask_text("How will you learn and grow?")
     give_today = ask_text("How will you give?")
+    plans_after_work = ask_text("What are your plans after work?")
 
     scripture_read = ask_text("Scripture read (e.g., Matthew 5)")
     prayer_focus = ask_text("Prayer focus")
 
     text = replace_single_bullet_under_question(text, "How will you learn and grow?", learn_grow)
     text = replace_single_bullet_under_question(text, "How will you give?", give_today)
+    if "What are your plans after work?" in text:
+        text = replace_single_bullet_under_question(text, "What are your plans after work?", plans_after_work)
 
     if scripture_read.strip():
         text = replace_line_value(text, "Scripture read:", scripture_read.strip())
