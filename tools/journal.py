@@ -278,6 +278,7 @@ def morning() -> Path:
 
     scripture_read = ask_text("Scripture read (e.g., Matthew 5)")
     prayer_focus = ask_text("Prayer focus")
+    daily_rules = ask_multi_items("What rules do you want to live by today?")
 
     text = replace_single_bullet_under_question(text, "How will you learn and grow?", learn_grow)
     text = replace_single_bullet_under_question(text, "How will you give?", give_today)
@@ -288,6 +289,12 @@ def morning() -> Path:
         text = replace_line_value(text, "Scripture read:", scripture_read.strip())
     if prayer_focus.strip():
         text = replace_line_value(text, "Prayer focus:", prayer_focus.strip())
+    if daily_rules:
+        text = replace_bullets_under_question(
+            text,
+            "What rules do you want to live by today?",
+            daily_rules,
+        )
 
 
     text = remove_empty_bullets(text)

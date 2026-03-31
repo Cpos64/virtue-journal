@@ -41,6 +41,10 @@
 - **Scripture read:**  
 - **Prayer focus:**  
 
+## Rules for Today
+**What rules do you want to live by today?**
+- 
+
 ---
 
 # Evening
