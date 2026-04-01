@@ -28,12 +28,6 @@
 **What do you want to accomplish?**
 - 
 
-**How will you learn and grow?**
-- 
-
-**How will you give?**
-- 
-
 **What are your plans after work?**
 - 
 

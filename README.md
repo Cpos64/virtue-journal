@@ -48,8 +48,7 @@ The morning entry sets the direction for the day.
 - Review unfinished items from yesterday and choose (Y/N) whether to carry each one into today
 - Set intentions:
   - What to accomplish
-  - How to learn and grow
-  - How to give
+  - What are your plans after work
 - Begin the day with prayer and the Word
 
 This is designed to be **quick, honest, and grounding**.

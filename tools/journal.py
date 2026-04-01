@@ -289,17 +289,13 @@ def morning() -> Path:
             combined_accomplishments,
         )
 
-    # Learning & Giving (single-item)
-    learn_grow = ask_text("How will you learn and grow?")
-    give_today = ask_text("How will you give?")
+    # Remaining morning prompts
     plans_after_work = ask_text("What are your plans after work?")
 
     scripture_read = ask_text("Scripture read (e.g., Matthew 5)")
     prayer_focus = ask_text("Prayer focus")
     daily_rules = ask_multi_items("What rules do you want to live by today?")
 
-    text = replace_single_bullet_under_question(text, "How will you learn and grow?", learn_grow)
-    text = replace_single_bullet_under_question(text, "How will you give?", give_today)
     if "What are your plans after work?" in text:
         text = replace_single_bullet_under_question(text, "What are your plans after work?", plans_after_work)
 
