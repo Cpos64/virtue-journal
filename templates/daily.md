@@ -45,6 +45,14 @@
 **What rules do you want to live by today?**
 - 
 
+## Weekly Plan (Mon–Sat)
+- **Monday plan:**  
+- **Tuesday plan:**  
+- **Wednesday plan:**  
+- **Thursday plan:**  
+- **Friday plan:**  
+- **Saturday plan:**  
+
 ---
 
 # Evening

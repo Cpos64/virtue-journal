@@ -23,6 +23,15 @@ VIRTUES = [
     "Generosity",
 ]
 
+WEEKLY_PLAN_LINE_PREFIXES = [
+    "Monday plan:",
+    "Tuesday plan:",
+    "Wednesday plan:",
+    "Thursday plan:",
+    "Friday plan:",
+    "Saturday plan:",
+]
+
 
 def entry_path_for(d: date) -> Path:
     yyyy = f"{d.year:04d}"
@@ -52,6 +61,7 @@ def init_today(force_if_empty: bool = True) -> Path:
                 "What do you want to accomplish?",
                 unfinished,
             )
+        text = apply_weekly_plan_carryover(text, d)
         return text
 
     if out_path.exists():
@@ -324,6 +334,70 @@ def replace_line_value(text: str, line_prefix: str, value: str) -> str:
     # Replace entire trailing part with exactly one space + value (or nothing if value blank)
     new_line = f"{m.group('label')} {value}".rstrip()
     return text[: m.start()] + new_line + text[m.end() :]
+
+
+def read_line_value(text: str, line_prefix: str) -> str:
+    """
+    Read the value on a markdown bullet line that starts with line_prefix.
+
+    Example:
+      - **Monday plan:** Call insurance
+    """
+    pattern = re.compile(
+        rf"^\s*-\s*\*\*{re.escape(line_prefix)}\*\*(?P<value>.*)$",
+        re.MULTILINE,
+    )
+    m = pattern.search(text)
+    if not m:
+        return ""
+    return m.group("value").strip()
+
+
+def read_weekly_plan_values(text: str) -> dict[str, str]:
+    values: dict[str, str] = {}
+    for prefix in WEEKLY_PLAN_LINE_PREFIXES:
+        value = read_line_value(text, prefix)
+        if value:
+            values[prefix] = value
+    return values
+
+
+def find_most_recent_sunday_entry(as_of: date) -> Path | None:
+    """
+    Return the most recent existing Sunday entry path on or before as_of.
+    """
+    days_since_sunday = (as_of.weekday() - 6) % 7
+    candidate = as_of - timedelta(days=days_since_sunday)
+
+    # Cap search to ~100 years to avoid an accidental infinite loop.
+    for _ in range(5200):
+        candidate_path = entry_path_for(candidate)
+        if candidate_path.exists():
+            return candidate_path
+        candidate -= timedelta(days=7)
+    return None
+
+
+def apply_weekly_plan_carryover(text: str, d: date) -> str:
+    """
+    Fill weekly plan lines from the most recent Sunday entry.
+    Sundays are left blank so a new week can be authored.
+    """
+    if d.weekday() == 6:  # Sunday
+        return text
+
+    sunday_path = find_most_recent_sunday_entry(d)
+    if not sunday_path:
+        return text
+
+    sunday_text = sunday_path.read_text(encoding="utf-8", errors="ignore")
+    values = read_weekly_plan_values(sunday_text)
+    if not values:
+        return text
+
+    for prefix, value in values.items():
+        text = replace_line_value(text, prefix, value)
+    return text
 
 def read_bullets_under_question(text: str, question_phrase: str) -> list[str]:
     """
