@@ -54,13 +54,6 @@ def init_today(force_if_empty: bool = True) -> Path:
 
     def build_today_text() -> str:
         text = render_daily_template(d)
-        unfinished = get_unfinished_tasks()
-        if unfinished:
-            text = replace_bullets_under_question(
-                text,
-                "What do you want to accomplish?",
-                unfinished,
-            )
         text = apply_weekly_plan_carryover(text, d)
         return text
 
@@ -242,6 +235,20 @@ def get_unfinished_tasks() -> list[str]:
 
     return unfinished
 
+
+def choose_unfinished_tasks_for_today(unfinished: list[str]) -> list[str]:
+    selected: list[str] = []
+    if not unfinished:
+        return selected
+
+    print("\nUnfinished from yesterday — add to today?\n")
+    for task in unfinished:
+        include = ask_yn(f"Add unfinished task to today: {task}")
+        if include == "Y":
+            selected.append(task)
+
+    return selected
+
 def morning() -> Path:
     path = init_today(force_if_empty=True)
     text = path.read_text(encoding="utf-8")
@@ -265,11 +272,12 @@ def morning() -> Path:
 
     text = fill_table_practiced(text, "## Virtues (Yesterday) — Y/N", virtue_answers)
 
-    # Accomplishments (multi-item loop)
-    existing_accomplishments = read_bullets_under_question(text, "What do you want to accomplish?")
+    # Accomplishments (carry-forward selection + new items)
+    unfinished = get_unfinished_tasks()
+    selected_unfinished = choose_unfinished_tasks_for_today(unfinished)
     new_accomplishments = ask_multi_items("What do you want to accomplish?")
 
-    combined_accomplishments = existing_accomplishments.copy()
+    combined_accomplishments = selected_unfinished.copy()
     for item in new_accomplishments:
         if item not in combined_accomplishments:
             combined_accomplishments.append(item)
