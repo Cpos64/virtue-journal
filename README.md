@@ -45,6 +45,7 @@ The morning entry sets the direction for the day.
 
 - Review sleep and discipline from the previous night
 - Reflect on **yesterday’s virtues** (Y / N)
+- Review unfinished items from yesterday and choose (Y/N) whether to carry each one into today
 - Set intentions:
   - What to accomplish
   - How to learn and grow
@@ -67,6 +68,19 @@ The evening entry closes the day intentionally and prepares for tomorrow.
   - one action to set tomorrow up well
 
 Tomorrow begins with how today ends.
+
+---
+
+### Weekly Planning (Sunday)
+
+On Sundays, the daily entry includes a **Weekly Plan (Mon-Sat)** section so you can map out
+Monday through Saturday.
+
+- Fill in weekly plans on Sunday
+- Monday-Saturday entries automatically carry those weekly plan lines forward
+- The next Sunday plan becomes the new source for the upcoming week
+
+This keeps your week visible each day without extra prompts.
 
 ---
 
