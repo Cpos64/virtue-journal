@@ -1,2 +1,6 @@
 # Personal journal entries (do not commit)
 entries/
+
+# Python
+__pycache__/
+*.pyc

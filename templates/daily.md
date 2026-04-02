@@ -61,11 +61,5 @@
 **How did you see the Father’s goodness?**
 - 
 
-## Pre-Decision (Tonight)
-- **What time will you get into bed?**  
-- **Will you pray before sleep?** (Y/N)  
-- **What is one thing you’ll do to set tomorrow up well?**
-- 
-
 ## Extra Journal (Optional)
 - 

@@ -55,18 +55,12 @@ This is designed to be **quick, honest, and grounding**.
 
 ---
 
-### Evening Review (Reflection + Pre-Decision)
+### Evening Review (Reflection)
 
-The evening entry closes the day intentionally and prepares for tomorrow.
+The evening entry closes the day intentionally.
 
 - Review accomplishments from this morning (each item is checked **Y/N**)
 - Reflect on learning and gratitude
-- Pre-decide:
-  - bedtime
-  - prayer before sleep
-  - one action to set tomorrow up well
-
-Tomorrow begins with how today ends.
 
 ---
 

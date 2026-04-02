@@ -430,7 +430,7 @@ def evening() -> Path:
     path = init_today(force_if_empty=True)
     text = path.read_text(encoding="utf-8")
 
-    print("\nEvening — quick review & pre-decision\n")
+    print("\nEvening — quick review\n")
 
     # 1) Per-accomplishment accountability (from morning bullets)
     accomplishments = read_bullets_under_question(text, "What do you want to accomplish?")
@@ -448,10 +448,6 @@ def evening() -> Path:
     learned = ask_text("What did you learn?")
     goodness = ask_text("How did you see the Father’s goodness?")
 
-    will_pray = ask_yn("Will you pray before sleep?")
-    bedtime = ask_text("What time will you get into bed (e.g., 10:30 PM)")
-    one_thing = ask_text("One thing you'll do to set tomorrow up well")
-
     # 3) Write accomplishments into the Evening Review section
     if accomplished_results:
         text = replace_bullets_under_question(
@@ -464,18 +460,6 @@ def evening() -> Path:
     # 4) Fill the other evening bullets
     text = replace_single_bullet_under_question(text, "What did you learn?", learned)
     text = replace_single_bullet_under_question(text, "How did you see the Father’s goodness?", goodness)
-
-    # 5) Fill Pre-Decision (Tonight) fields
-    text = replace_yn_for_label(text, "Will you pray before sleep", will_pray)
-
-    if bedtime.strip():
-        text = replace_line_value(text, "What time will you get into bed?", bedtime.strip())
-    if one_thing.strip():
-        text = replace_bullets_under_question(
-            text,
-            "What is one thing you’ll do to set tomorrow up well?",
-            [one_thing.strip()],
-        )
 
     text = remove_empty_bullets(text)
     path.write_text(text, encoding="utf-8")
